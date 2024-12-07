@@ -15,7 +15,7 @@ def get_data_for_glass_and_no_glass_measurments():
     ch1_avg_peak_voltages_no_glass = []
     ch2_avg_peak_voltages_no_glass = []
     for mm in num_of_mm:
-        file_path = f"../data/high/Harhava_material2_1sheet_{mm}_space_high.csv"
+        file_path = f'../data/high/Harhava_material2_1sheet_{mm}_space_high.csv'
         ch1_avg_peak_voltage, ch2_avg_peak_voltage = extract_max_peak(file_path)
         ch1_avg_peak_voltages.append(ch1_avg_peak_voltage)
         ch2_avg_peak_voltages.append(ch2_avg_peak_voltage)
@@ -43,20 +43,27 @@ def get_data_for_diagonal_and_not_diagonal_glass():
     num_of_sheets = np.arange(0, 14, 2)
     ch1_avg_peak_voltages = []
     ch2_avg_peak_voltages = []
+    ch1_avg_peak_voltages_old = []
     ch1_avg_peak_voltages_diag = []
     ch2_avg_peak_voltages_diag = []
+    ch2_avg_peak_voltages_old = []
     for sheet in num_of_sheets:
         file_path = f"../data/high/Harhava_material2_1sheet_{sheet}_space_high.csv"
         ch1_avg_peak_voltage, ch2_avg_peak_voltage = extract_max_peak(file_path)
         ch1_avg_peak_voltages.append(ch1_avg_peak_voltage)
         ch2_avg_peak_voltages.append(ch2_avg_peak_voltage)
 
+        file_path_old = f"../data/high/Harhava_material2_1sheet_{sheet}_space_high_old.csv"
+        ch1_avg_peak_voltage_old, ch2_avg_peak_voltage_old = extract_max_peak(file_path_old)
+        ch1_avg_peak_voltages_old.append(ch1_avg_peak_voltage_old)
+        ch2_avg_peak_voltages_old.append(ch2_avg_peak_voltage_old)
+
         file_path_no_glass = f'../data/high/Harhava_material2_1sheet_{sheet}_space_high_diag.csv'
         ch1_avg_peak_voltage_diag, ch2_avg_peak_voltage_diag = extract_max_peak(file_path_no_glass)
         ch1_avg_peak_voltages_diag.append(ch1_avg_peak_voltage_diag)
         ch2_avg_peak_voltages_diag.append(ch2_avg_peak_voltage_diag)
 
-    return num_of_sheets, ch1_avg_peak_voltages, ch2_avg_peak_voltages, ch1_avg_peak_voltages_diag, ch2_avg_peak_voltages_diag
+    return num_of_sheets, ch1_avg_peak_voltages, ch2_avg_peak_voltages, ch1_avg_peak_voltages_diag, ch2_avg_peak_voltages_diag, ch1_avg_peak_voltages_old, ch2_avg_peak_voltages_old
 
 def create_glass_sanity_check_graphs():
     # Create two plots in two separate figures, one for each channel
@@ -112,3 +119,4 @@ def create_glass_sanity_check_graphs():
     plt.show()
 
 create_glass_sanity_check_graphs()
+
