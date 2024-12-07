@@ -48,7 +48,7 @@ def plot_1_sheet_graphs():
 
     # graph 1 - H&B vs number of glass sheets of under one sheet material 2 and material 5
     axes[0].scatter(mat2_spaces, ch1_peak_voltages_mat2, label='Material 2', s=50)
-    axes[0].scatter(mat5_spaces, ch1_peak_voltages_mat5, label='Material 5' , s=30)
+    axes[0].scatter(mat5_spaces, ch1_peak_voltages_mat5, label='Material 5', s=30)
     axes[0].set_xlabel('Number of glass sheets')
     axes[0].set_ylabel('H (a.u.)')
 
