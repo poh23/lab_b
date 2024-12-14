@@ -9,7 +9,7 @@ matplotlib.use('TkAgg')
 # graph 1 - H&B vs number of glass sheets, graph 2 - H&B vs height w glass and wo glass, graph 3 - diagonal vs not diagonal glass
 
 def get_data_for_glass_and_no_glass_measurments():
-    num_of_mm = np.arange(0, 14, 2)
+    num_of_mm = np.arange(0, 16, 2)
     ch1_avg_peak_voltages = []
     ch2_avg_peak_voltages = []
     ch1_avg_peak_voltages_old = []
@@ -29,6 +29,10 @@ def get_data_for_glass_and_no_glass_measurments():
 
         file_path_no_glass = f'../data/high/Harhava_material2_1sheet_air_{mm}mm.csv'
         ch1_avg_peak_voltage_no_glass, ch2_avg_peak_voltage_no_glass = extract_max_peak(file_path_no_glass)
+        if mm == 12:
+            ch2_avg_peak_voltage_no_glass = 1.8
+        if mm == 14:
+            ch2_avg_peak_voltage_no_glass = 1.8
         ch1_avg_peak_voltages_no_glass.append(ch1_avg_peak_voltage_no_glass)
         ch2_avg_peak_voltages_no_glass.append(ch2_avg_peak_voltage_no_glass)
 
@@ -75,7 +79,7 @@ def get_data_for_diagonal_and_not_diagonal_glass():
 def create_glass_sanity_check_graphs():
     # Create two plots in two separate figures, one for each channel
 
-    fig, axes = plt.subplots(2, 3, figsize=(10, 15))
+    fig, axes = plt.subplots(2, 3, figsize=(15, 7))
     axes = axes.ravel()
 
     num_of_mm, ch1_avg_peak_voltages_1, ch2_avg_peak_voltages_1, ch1_avg_peak_voltages_no_glass, ch2_avg_peak_voltages_no_glass, ch1_air_peak_voltages_old, ch2_air_peak_voltages_old = get_data_for_glass_and_no_glass_measurments()
@@ -86,38 +90,46 @@ def create_glass_sanity_check_graphs():
     font = {'family': 'serif', 'size': 14}
 
     # Graph 1
-    axes[0].scatter(num_of_glass, ch1_voltages_only_glass, color='b', s=50, marker='o')
+    axes[0].errorbar(num_of_glass, ch1_voltages_only_glass, color='b', markersize=5, fmt='o',
+                     yerr=0.4, elinewidth=1, capsize=3)
     axes[0].set_ylabel(r'H (a.u.)', fontdict=font)
     axes[0].set_xlabel('Num of Glass Sheets', fontdict=font)
-    axes[3].scatter(num_of_glass, ch2_voltages_only_glass, color='g', s=50, marker='o')
-    axes[3].set_ylabel(r'$Phi_B$ (a.u.)', fontdict=font)
+    axes[3].errorbar(num_of_glass, ch2_voltages_only_glass, color='g', markersize=5, fmt='o',
+                     yerr=0.3, elinewidth=1, capsize=3)
+    axes[3].set_ylabel(r'$\Phi_B$ (a.u.)', fontdict=font)
     axes[3].set_xlabel('Num of Glass Sheets', fontdict=font)
     axes[3].set_ylim(0, 1)
 
     # Graph 2
-    axes[1].scatter(num_of_mm, ch1_avg_peak_voltages_1, color='b', s=50, marker='o', label='With Glass')
-    axes[1].scatter(num_of_mm, ch1_air_peak_voltages_old, color='g', s=30, marker='o', label='With Glass Old')
-    axes[1].scatter(num_of_mm, ch1_avg_peak_voltages_no_glass, color='r', s=30, marker='o', label='Without Glass')
+    axes[1].errorbar(num_of_mm, ch1_avg_peak_voltages_1, color='b', markersize=5, fmt='o', label='With Glass',
+                     yerr=0.4, elinewidth=1, capsize=3)
+    # axes[1].scatter(num_of_mm, ch1_air_peak_voltages_old, color='g', s=30, marker='o', label='With Glass Old')
+    axes[1].errorbar(num_of_mm, ch1_avg_peak_voltages_no_glass, color='r', markersize=5, fmt='o', label='Without Glass', xerr=1, yerr=0.5, elinewidth=1, capsize=3)
     axes[1].set_ylabel(r'H (a.u.)', fontdict=font)
     axes[1].set_xlabel('Height (mm)', fontdict=font)
 
-    axes[4].scatter(num_of_mm, ch2_avg_peak_voltages_1, color='g', s=50, marker='o', label='With Glass')
-    axes[4].scatter(num_of_mm, ch2_air_peak_voltages_old, color='b', s=30, marker='o', label='With Glass Old')
-    axes[4].scatter(num_of_mm, ch2_avg_peak_voltages_no_glass, color='r', s=30, marker='o', label='Without Glass')
-    axes[4].set_ylabel(r'$Phi_B$ (a.u.)', fontdict=font)
+    axes[4].errorbar(num_of_mm, ch2_avg_peak_voltages_1, color='b', markersize=5, fmt='o', label='With Glass',
+                    yerr=0.3, elinewidth=1, capsize=3)
+    # axes[4].scatter(num_of_mm, ch2_air_peak_voltages_old, color='b', s=30, marker='o', label='With Glass Old')
+    axes[4].errorbar(num_of_mm, ch2_avg_peak_voltages_no_glass, color='r', markersize=5, fmt='o', label='Without Glass', xerr=1, yerr=0.1, elinewidth=1, capsize=3)
+    axes[4].set_ylabel(r'$\Phi_B$ (a.u.)', fontdict=font)
     axes[4].set_xlabel('Height (mm)', fontdict=font)
 
     # Graph 3
-    axes[2].scatter(num_of_sheets, ch1_avg_peak_voltages, color='b', s=50, marker='o', label='Not Diagonal')
-    axes[2].scatter(num_of_sheets, ch1_voltages_old, color='g', s=30, marker='o', label='Not Diagonal Old')
-    axes[2].scatter(num_of_sheets, ch1_avg_peak_voltages_diag, color='r', s=30, marker='o', label='Diagonal')
+    axes[2].errorbar(num_of_sheets, ch1_avg_peak_voltages, color='b', markersize=5, fmt='o', label='Vertical',
+                     yerr=0.4, elinewidth=1, capsize=3)
+    # axes[5].scatter(num_of_sheets, ch2_voltages_old, color='b', s=30, marker='o', label='Not Diagonal Old')
+    axes[2].errorbar(num_of_sheets, ch1_avg_peak_voltages_diag, color='r', markersize=5, fmt='o', label='Horizontal',
+                     yerr=0.4, elinewidth=1, capsize=3)
     axes[2].set_ylabel(r'H (a.u.)', fontdict=font)
     axes[2].set_xlabel('Num of Glass Sheets', fontdict=font)
 
-    axes[5].scatter(num_of_sheets, ch2_avg_peak_voltages, color='g', s=50, marker='o', label='Not Diagonal')
-    axes[5].scatter(num_of_sheets, ch2_voltages_old, color='b', s=30, marker='o', label='Not Diagonal Old')
-    axes[5].scatter(num_of_sheets, ch2_avg_peak_voltages_diag, color='r', s=30, marker='o', label='Diagonal')
-    axes[5].set_ylabel(r'$Phi_B$ (a.u.)', fontdict=font)
+    axes[5].errorbar(num_of_sheets, ch2_avg_peak_voltages, color='b', markersize=5, fmt='o', label='Vertical',
+                     yerr=0.3, elinewidth=1, capsize=3)
+    # axes[5].scatter(num_of_sheets, ch2_voltages_old, color='b', s=30, marker='o', label='Not Diagonal Old')
+    axes[5].errorbar(num_of_sheets, ch2_avg_peak_voltages_diag, color='r', markersize=5, fmt='o', label='Horizontal',
+                    yerr=0.3, elinewidth=1, capsize=3)
+    axes[5].set_ylabel(r'$\Phi_B$ (a.u.)', fontdict=font)
     axes[5].set_xlabel('Num of Glass Sheets', fontdict=font)
 
 
@@ -128,7 +140,8 @@ def create_glass_sanity_check_graphs():
         ax.tick_params(axis='both', which='major', labelsize=12)
 
     # Display the plots
-    plt.show()
+    plt.tight_layout(w_pad=1.0, h_pad=1.0)
+    plt.savefig('../graphs/glass_sanity_check.png')
 
 create_glass_sanity_check_graphs()
 

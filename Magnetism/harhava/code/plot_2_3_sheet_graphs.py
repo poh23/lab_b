@@ -32,46 +32,39 @@ def create_list_voltages_for_different_space_nums_3_sheets():
 
     return spaces, ch1_avg_peak_voltages, ch2_avg_peak_voltages
 
+def get_max_of_one_sheet():
+    file_path = f"../data/high/Harhava_material2_1sheet_0_space_high.csv"
+    ch1_avg_peak_voltage, ch2_avg_peak_voltage = extract_max_peak(file_path)
+    return ch1_avg_peak_voltage, ch2_avg_peak_voltage
+
 
 def plot_2_3_sheet_graphs():
     # Create two plots in two separate figures, one for each channel
-    fig, axes = plt.subplots(2,2, figsize=(10, 5))
+    fig, axes = plt.subplots(2,1, figsize=(10, 10))
     axes = axes.ravel()
 
     mat2_spaces, ch1_peak_voltages_mat2, ch2_peak_voltages_mat2 = create_list_voltages_for_different_space_nums_2_sheets(2)
-    mat5_spaces, ch1_peak_voltages_mat5, ch2_peak_voltages_mat5 = create_list_voltages_for_different_space_nums_2_sheets(5)
-
-    spaces, ch1_avg_peak_voltages_3_bars, ch2_avg_peak_voltages_3_bars = create_list_voltages_for_different_space_nums_3_sheets()
+    ch1_one_sheet, ch2_one_sheet = get_max_of_one_sheet()
 
     # Set universal styling options
     font = {'family': 'serif', 'size': 14}
 
     # graph 1 - H&B vs number of glass sheets of under one sheet material 2 and material 5
-    axes[0].scatter(mat2_spaces, ch1_peak_voltages_mat2, label='Material 2', s=50)
-    axes[0].scatter(mat5_spaces, ch1_peak_voltages_mat5, label='Material 5' , s=30)
+    axes[0].errorbar(mat2_spaces, ch1_peak_voltages_mat2, yerr=0.4, fmt='o', label='Material 2', markersize=5, capsize=3)
+    axes[0].axhline(y=ch1_one_sheet, color='black', linestyle='--', label='Material 2 1 sheet')
     axes[0].set_ylabel('H (a.u.)', fontdict=font)
 
-    axes[1].scatter(mat2_spaces, ch2_peak_voltages_mat2, label='Material 2', s=50)
-    axes[1].scatter(mat5_spaces, ch2_peak_voltages_mat5, label='Material 5', s=30)
+    axes[1].errorbar(mat2_spaces, ch2_peak_voltages_mat2, yerr=0.3, fmt='o', label='Material 2', markersize=5, capsize=3)
+    axes[1].axhline(y=ch2_one_sheet, color='black', linestyle='--', label='Material 2 1 sheet')
     axes[1].set_ylabel('$\Phi_B$ (a.u.)', fontdict=font)
 
-    # graph 2 - H&B standing vs. not standing
-    axes[2].scatter(spaces, ch1_avg_peak_voltages_3_bars)
-    axes[2].set_ylabel('H (a.u.)', fontdict=font)
-
-    axes[3].scatter(spaces, ch2_avg_peak_voltages_3_bars)
-    axes[3].set_ylabel('$\Phi_B$ (a.u.)', fontdict=font)
 
     # Add legends to the plots
     for ax in axes:
         ax.grid(True, which='both', linestyle='--', linewidth=0.5)
         ax.tick_params(axis='both', which='major', labelsize=12)
-        ax.set_xlabel('Number of sheets', fontdict=font)
-        ax.legend()
-
-    # Add group titles
-    fig.text(0.5, 0.95, 'H & B vs. Number of sheets 2 bars', ha='center', va='center', fontdict=font)
-    fig.text(0.5, 0.5, 'Material 2 3 bars', ha='center', va='center', fontdict=font)
+        ax.set_xlabel('Height (mm)', fontdict=font)
+        # ax.legend()
 
     # Display the plots
     plt.show()
