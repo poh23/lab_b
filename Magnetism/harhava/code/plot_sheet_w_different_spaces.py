@@ -76,19 +76,36 @@ def plot_sheet_w_different_spaces():
     axes2[1].set_ylabel(r'$\Phi_B$ (a.u.)', fontdict=font)
 
     # Add legends to the plots
-    for ax in axes1:
+    for idx, ax in enumerate(axes1):
         ax.grid(True, which='both', linestyle='--', linewidth=0.5)
         ax.tick_params(axis='both', which='major', labelsize=12)
+        ax.annotate(f"{chr(65 + idx)}",  # This gives 'a', 'b', 'c'...
+                    xy=(-0.07, 0.98),  # Relative position (2% from left, 98% from bottom)
+                    xycoords='axes fraction',
+                    font = font,
+                    fontsize = 16,
+                    fontweight='bold',
+                    ha='left',
+                    va='top')
         #ax.legend()
 
-    for ax in axes2:
+
+    for idx, ax in enumerate(axes2):
         ax.grid(True, which='both', linestyle='--', linewidth=0.5)
         ax.tick_params(axis='both', which='major', labelsize=12)
+        ax.annotate(f"{chr(65 + idx)}",  # This gives 'a', 'b', 'c'...
+                    xy=(-0.07, 0.98),  # Relative position (2% from left, 98% from bottom)
+                    xycoords='axes fraction',
+                    font=font,
+                    fontsize=16,
+                    fontweight='bold',
+                    ha='left',
+                    va='top')
         #ax.legend()
 
     # Display the plots
-    fig1.tight_layout(pad=5.0)
-    fig2.tight_layout(pad=5.0)
+    fig1.tight_layout(pad=2.0)
+    fig2.tight_layout(pad=2.0)
     plt.show()
 
 plot_sheet_w_different_spaces()

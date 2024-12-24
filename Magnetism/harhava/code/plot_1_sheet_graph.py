@@ -61,13 +61,23 @@ def plot_1_sheet_graphs():
     # y_err = np.sqrt((0.4 / np.array(ch2_peak_voltages_mat2))**2 + (0.3 * np.array(ch1_peak_voltages_mat2) / np.array(ch2_peak_voltages_mat2)**2)**2)
 
     # Graph 2 - Ratio vs. number of glass sheets for Material 2 and Material 5
-    axes[2].errorbar(mat2_spaces, 1/ratio_mat2, markersize=5, fmt='o',
+    axes[2].errorbar(mat2_spaces, ratio_mat2, markersize=5, fmt='o',
                      yerr=0, elinewidth=1, capsize=3)
     # Calculate linear fit
-    slope, intercept = np.polyfit(mat2_spaces, 1 / ratio_mat2, 1)
+    fit = np.polyfit(mat2_spaces,  ratio_mat2, 1, cov=True)
+    slope, intercept = fit[0]
+    intercept_var, slope_var = np.sqrt(np.diag(fit[1]))
     fit_line = slope * mat2_spaces + intercept
+    residuals = ratio_mat2 - fit_line
+    ss_res = np.sum(residuals ** 2)
+    ss_tot = np.sum((ratio_mat2 - np.mean(ratio_mat2)) ** 2)
+    r_squared = 1 - (ss_res / ss_tot)
 
     print(f'Linear fit: y = {slope:.3f}x + {intercept:.3f}')
+    print(f'Chi squared: {ss_res}')
+    print(f'Slope error: {slope_var:.4f}')
+    print(f'Intercept error: {intercept_var:.4f}')
+    print(f'R squared: {r_squared:.4f}')
 
     # Plot linear fit
     axes[2].plot(mat2_spaces, fit_line, color='orange', label='Linear fit')
@@ -76,9 +86,17 @@ def plot_1_sheet_graphs():
     axes[2].set_ylabel(r'$\frac{H}{\Phi_B}$ (a.u.)', fontdict=font)
 
     # Add legends to the plots
-    for ax in axes:
+    for idx, ax in enumerate(axes):
         ax.grid(True, which='both', linestyle='--', linewidth=0.5)
         ax.tick_params(axis='both', which='major', labelsize=12)
+        ax.annotate(f"{chr(65 + idx)}",  # This gives 'a', 'b', 'c'...
+                    xy=(-0.1, 0.98),  # Relative position (2% from left, 98% from bottom)
+                    xycoords='axes fraction',
+                    font=font,
+                    fontsize=16,
+                    fontweight='bold',
+                    ha='left',
+                    va='top')
 
     # Display the plots
     plt.tight_layout()

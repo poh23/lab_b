@@ -134,13 +134,21 @@ def create_glass_sanity_check_graphs():
 
 
     # Add legends to the plots
-    for ax in axes:
+    for idx, ax in enumerate(axes):
         ax.legend()
         ax.grid(True, which='both', linestyle='--', linewidth=0.5)
         ax.tick_params(axis='both', which='major', labelsize=12)
+        ax.annotate(f"{chr(65 + idx)}",  # This gives 'a', 'b', 'c'...
+                    xy=(-0.18, 0.98),  # Relative position (2% from left, 98% from bottom)
+                    xycoords='axes fraction',
+                    font=font,
+                    fontsize=16,
+                    fontweight='bold',
+                    ha='left',
+                    va='top')
 
     # Display the plots
-    plt.tight_layout(w_pad=1.0, h_pad=1.0)
+    plt.tight_layout(w_pad=2.0, h_pad=1.0)
     plt.savefig('../graphs/glass_sanity_check.png')
 
 create_glass_sanity_check_graphs()

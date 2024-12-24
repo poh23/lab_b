@@ -60,10 +60,18 @@ def plot_2_3_sheet_graphs():
 
 
     # Add legends to the plots
-    for ax in axes:
+    for idx, ax in enumerate(axes):
         ax.grid(True, which='both', linestyle='--', linewidth=0.5)
         ax.tick_params(axis='both', which='major', labelsize=12)
         ax.set_xlabel('Height (mm)', fontdict=font)
+        ax.annotate(f"{chr(65 + idx)}",  # This gives 'a', 'b', 'c'...
+                    xy=(-0.1, 0.98),  # Relative position (2% from left, 98% from bottom)
+                    xycoords='axes fraction',
+                    font=font,
+                    fontsize=16,
+                    fontweight='bold',
+                    ha='left',
+                    va='top')
         # ax.legend()
 
     # Display the plots
