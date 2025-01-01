@@ -10,6 +10,8 @@ colors = {460: 'b', 525: 'g', 625: 'r'}
 radii = {"disc1": 3.75, "disc2": 6.25, "disc3": 5}
 font = {'family': 'serif', 'size': 16}
 x_errors ={"disc1": 75, "disc2": 165, "disc3": 165, "disc4": 1.5}
+lambda_fits = {'disc1': [1.4264179 , 5.99410476], 'disc2': [1.77477104, 6.99310963], 'disc3': [2.24651978, 4.27873176], 'disc4': [38.262, 4.086]}
+R_fits = {460: [0.00928439, 8.38719338], 525: [0.00797887, 6.22926252], 625: [0.00871047, 7.37956197]}
 
 def extract_data():
     # Load the CSV file
@@ -36,22 +38,21 @@ def plot_1():
 
     for i, disc in enumerate(other_discs):
         disc_df = df[df['file name'].str.contains(disc)]
-        red_blue_df = disc_df[disc_df['Lamda (wave length nm)'].isin([460, 625])]
         for wavelength in unique_wavelengths:
             wavelength_df = disc_df[disc_df['Lamda (wave length nm)'] == wavelength]
             axes[i].errorbar(wavelength_df['F/lambda'], wavelength_df['Num of Isochromes'], yerr=wavelength_df['error'], xerr= x_errors[disc]/wavelength, fmt='o', label=f'{wavelength} nm', markersize=5,
                              capsize=1, elinewidth=1, color=colors[wavelength])
             # Add linear fit
-        fit = np.polyfit(red_blue_df['F/lambda'], red_blue_df['Num of Isochromes'], 1, cov=True)
+        fit = np.polyfit(disc_df['F/lambda'], disc_df['Num of Isochromes'], 1, cov=True)
         p = np.poly1d(fit[0])
         intercept_var, slope_var = np.sqrt(np.diag(fit[1]))
-        axes[i].plot(red_blue_df['F/lambda'], p(red_blue_df['F/lambda']), "--", linewidth=0.9, color='black',
+        axes[i].plot(disc_df['F/lambda'], p(disc_df['F/lambda']), "--", linewidth=0.9, color='black',
                      label=f'Linear fit: {p[1]:.2f}x + {p[0]:.2f}')
         print(f'{disc} linear fit: {p[1]:.5f}x + {p[0]:.5f}')
 
         # Calculate R squared
-        values = red_blue_df['Num of Isochromes'].values
-        residuals = values - p(red_blue_df['F/lambda'])
+        values = disc_df['Num of Isochromes'].values
+        residuals = values - p(disc_df['F/lambda'])
         ss_res = np.sum(residuals ** 2)
         ss_tot = np.sum((values - np.mean(values)) ** 2)
         r_squared = 1 - (ss_res / ss_tot)
@@ -59,6 +60,9 @@ def plot_1():
         print(f'Slope error: {slope_var:.4f}')
         print(f'Intercept error: {intercept_var:.4f}')
         print(f'R squared: {r_squared:.4f}')
+
+        fits = {disc: fit[0]}
+        print(fits)
 
         axes[i].set_title(f'R = {radii[disc]} cm', fontdict=font)
         axes[i].set_xlabel(r'$\frac{F}{\lambda}$ ($\frac{N}{nm}$)', fontdict=font)
@@ -110,6 +114,9 @@ def plot_2():
         print(f'Intercept error: {intercept_var:.4f}')
         print(f'R squared: {r_squared:.4f}')
 
+        fits = {wavelength: fit[0]}
+        print(fits)
+
         axes[i].set_title(fr'$\lambda$={wavelength} nm', fontdict=font)
         axes[i].set_xlabel(r'$\frac{F}{R}$ ($\frac{N}{cm}$)', fontdict=font)
         axes[i].set_ylabel('N', fontdict=font)
@@ -132,12 +139,12 @@ def plot_2():
 def plot_3():
     df, unique_discs, unique_wavelengths, disc4_df, other_discs = extract_data()
 
-    fig, axes = plt.subplots(1, 1, figsize=(7, 8), sharex=True, sharey=True)
+    fig, axes = plt.subplots(1, 1, figsize=(4, 5), sharex=True, sharey=True)
 
     for wavelength in unique_wavelengths:
         wavelength_df = disc4_df[disc4_df['Lamda (wave length nm)'] == wavelength]
         axes.errorbar(wavelength_df['F/lambda'], wavelength_df['Num of Isochromes'], yerr=wavelength_df['error'], xerr=x_errors['disc4']/wavelength ,fmt='o', label=f'{wavelength} nm', markersize=5,
-                         capsize=1, elinewidth=1)
+                         capsize=1, elinewidth=1, color=colors[wavelength])
         # Add linear fit
     fit = np.polyfit(disc4_df['F/lambda'], disc4_df['Num of Isochromes'], 1, cov=True)
     p = np.poly1d(fit[0])
@@ -157,6 +164,9 @@ def plot_3():
     print(f'Intercept error: {intercept_var:.4f}')
     print(f'R squared: {r_squared:.4f}')
 
+    fits = {'disc4': fit[0]}
+    print(fits)
+
     axes.set_xlabel(r'$\frac{F}{\lambda}$ ($\frac{N}{nm}$)', fontdict=font)
     axes.set_ylabel('N', fontdict=font)
     axes.legend(prop={'family': 'serif', 'size': 10})
@@ -172,7 +182,6 @@ def plot_4():
     font = {'family': 'serif', 'size': 18}
     colors = ['blue', 'green', 'red']
     wave_lengths = {'blue': 460, 'green': 525, 'red': 625}
-    fits = {'disc1': [1.689,6.33], 'disc2': [1.851,7.14], 'disc3': [2.5, 4.24], 'disc4': [38.262, 4.08]}
     # Load the CSV file
     file_path = r'data/white_isochromes.csv'
     df = pd.read_csv(file_path)
@@ -188,7 +197,7 @@ def plot_4():
             axes[i].errorbar(disc_df['F']/wave_lengths[color], disc_df[f'N {color} isochromes'], yerr=disc_df[f'{color}_error'], xerr=x_errors[disc]/wave_lengths[color], fmt='o', label=f'{wave_lengths[color]} nm', markersize=5,
                              capsize=1, elinewidth=1, color=color)
         # Add linear fit
-        p = np.poly1d(fits[disc])
+        p = np.poly1d(lambda_fits[disc])
         axes[i].plot(disc_df['F']/wave_lengths['blue'], p(disc_df['F']/wave_lengths['blue']), "--", linewidth=0.9, color='black')
 
         axes[i].set_title(f'Disc {disc[-1]}', fontdict=font)
@@ -209,7 +218,45 @@ def plot_4():
     plt.tight_layout(h_pad=4.0, w_pad=4.0)
     plt.savefig('graphs/white_f_lambda_plots.png')
 
-plot_4()
+def plot_5():
+    df, unique_discs, unique_wavelengths, disc4_df, other_discs = extract_data()
+
+    fig1, axes1 = plt.subplots(1, 1, figsize=(6, 5))
+    fig2, axes2 = plt.subplots(1, 1, figsize=(6, 5))
+
+    discs3_df = df[df['file name'].str.contains('|'.join(other_discs))]
+
+    for disc in other_discs:
+        disc_df = df[df['file name'].str.contains(disc)]
+        p = np.poly1d(lambda_fits[disc])
+        axes1.plot(disc_df['F/lambda'], p(disc_df['F/lambda']), linewidth=0.9,
+                     label=f'R = {radii[disc]} cm')
+
+    for wavelength in unique_wavelengths:
+        wavelength_df = discs3_df[discs3_df['Lamda (wave length nm)'] == wavelength]
+        p = np.poly1d(R_fits[wavelength])
+        axes2.plot(wavelength_df['F/R'], p(wavelength_df['F/R']), linewidth=0.9,
+                     label=fr'$\lambda$ = {wavelength} nm', color = colors[wavelength])
+
+
+    axes1.set_xlabel(r'$\frac{F}{\lambda}$ ($\frac{N}{nm}$)', fontdict=font)
+    axes1.set_ylabel('N', fontdict=font)
+    axes2.set_xlabel(r'$\frac{F}{R}$ ($\frac{N}{cm}$)', fontdict=font)
+    axes2.set_ylabel('N', fontdict=font)
+
+    for idx, ax in enumerate([axes1, axes2]):
+        ax.legend(prop = {'family': 'serif', 'size': 12})
+        ax.grid(True, which='both', linestyle='--', linewidth=0.5)
+        ax.tick_params(axis='both', which='major', labelsize=12)
+
+    fig1.tight_layout()
+    fig2.tight_layout()
+    fig1.savefig(f'graphs/fit_plot_1.png')
+    fig2.savefig(f'graphs/fit_plot_2.png')
+
+
+
+plot_2()
 
 
 
