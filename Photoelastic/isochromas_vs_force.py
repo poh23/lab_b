@@ -15,7 +15,7 @@ R_fits = {460: [0.00928439, 8.38719338], 525: [0.00797887, 6.22926252], 625: [0.
 
 def extract_data():
     # Load the CSV file
-    file_path = r'data/Seperate_colors.csv'
+    file_path = r'data/number_of_isochromes.csv'
     df = pd.read_csv(file_path)
 
     # Extract unique discs
@@ -30,7 +30,7 @@ def extract_data():
 
 
 # plot 1 f/lamda plots for discs one through three
-def plot_1():
+def plot_1(ax):
     df, unique_discs, unique_wavelengths, disc4_df, other_discs = extract_data()
 
     fig, axes = plt.subplots(1, 3, figsize=(12, 5), sharex=True, sharey=True)
@@ -85,12 +85,13 @@ def plot_1():
 # plot 2 f/r plots for discs one through three
 def plot_2():
     df, unique_discs, unique_wavelengths, disc4_df, other_discs = extract_data()
+    all_disc_df = df[df['file name'].str.contains('|'.join(other_discs))]
 
     fig, axes = plt.subplots(1, 3, figsize=(12, 5), sharex=True, sharey=True)
     axes = axes.flatten()
 
     for i, wavelength in enumerate(unique_wavelengths):
-        wavelength_df = df[df['Lamda (wave length nm)'] == wavelength]
+        wavelength_df = all_disc_df[all_disc_df['Lamda (wave length nm)'] == wavelength]
         for disc in other_discs:
             disc_df = wavelength_df[wavelength_df['file name'].str.contains(disc)]
             axes[i].errorbar(disc_df['F/R'], disc_df['Num of Isochromes'], yerr=disc_df['error'], xerr= x_errors[disc]/radii[disc], fmt='o', label=f'{radii[disc]} cm', markersize=5,
@@ -183,7 +184,7 @@ def plot_4():
     colors = ['blue', 'green', 'red']
     wave_lengths = {'blue': 460, 'green': 525, 'red': 625}
     # Load the CSV file
-    file_path = r'data/white_isochromes.csv'
+    file_path = r'data/white_isochromes_new.csv'
     df = pd.read_csv(file_path)
 
     unique_discs = df['white files'].str.split('_').str[0].unique()
@@ -256,7 +257,7 @@ def plot_5():
 
 
 
-plot_2()
+
 
 
 
