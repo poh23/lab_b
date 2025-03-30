@@ -2,7 +2,7 @@ from pathlib import Path
 import pandas as pd
 
 # Define the file path using Path and raw string to avoid unicode errors
-file_path = Path(r"C:\Users\Einav\Desktop\Uni\שנה ג\Semester b\lab b2\Interference\AngleCalibration.txt")
+file_path = Path(r"C:\Users\mayas\OneDrive\מסמכים\לימודים\year c\lab b\Interference\data\wideslit.txt")
 
 # Read the file using whitespace as separator (new recommended method)
 df = pd.read_csv(file_path, sep=r'\s+')
