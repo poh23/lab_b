@@ -138,7 +138,7 @@ for i, ax in enumerate(axs):
         va='top', )
 
 plt.tight_layout()
-plt.savefig('../graphs/one_slit_figure.png')
+plt.savefig('../graphs/one_slit_figure.svg')
 plt.show()
 
 
