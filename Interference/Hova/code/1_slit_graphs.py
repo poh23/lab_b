@@ -117,7 +117,7 @@ fig, axs = plt.subplots(2, 2, figsize=(12, 6), sharex='col',
 # Analyze and plot narrow and wide slit data
 analyze_slit(
     '../data/narrowslit.csv', ax_main_narrow, ax_res_narrow,
-    slit_type='Narrow', aperture_width_deg=0.0001
+    slit_type='Narrow', aperture_width_deg=0.3
 )
 
 analyze_slit(
@@ -138,7 +138,7 @@ for i, ax in enumerate(axs):
         va='top', )
 
 plt.tight_layout()
-plt.savefig('../graphs/one_slit_figure.svg')
+plt.savefig('../graphs/one_slit_figure.pdf')
 plt.show()
 
 

@@ -137,5 +137,5 @@ for i, ax in enumerate(axs):
         va='top', )
 
 plt.tight_layout()
-plt.savefig('../graphs/two_slits_figure.svg')
+plt.savefig('../graphs/two_slits_figure.pdf')
 plt.show()
