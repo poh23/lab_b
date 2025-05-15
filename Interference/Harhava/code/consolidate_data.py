@@ -16,8 +16,8 @@ def extract_data_from_csv_files(folder_path):
     """
     # Dictionary to map colors to wavelengths (in nm)
     color_to_wavelength = {
-        'red': 625,  # Red light wavelength (approximate)
-        'green': 525,  # Green light wavelength (approximate)
+        'red': 640,  # Red light wavelength (approximate)
+        'green': 530,  # Green light wavelength (approximate)
         'blue': 460  # Blue light wavelength (approximate)
     }
 
@@ -32,6 +32,18 @@ def extract_data_from_csv_files(folder_path):
         'red': None,
         'green': None,
         'blue': None
+    }
+
+    diameter_err_dict = {
+        0.5: 0.05,
+        0.75: 0.075,
+        1: 0.1
+    }
+
+    wv_err_dict = {
+        'red': 20,
+        'green': 10,
+        'blue': 10
     }
 
     # List to store data for all files
@@ -105,6 +117,8 @@ def extract_data_from_csv_files(folder_path):
 
         # Get wavelength for the color
         wavelength = color_to_wavelength.get(color)
+        wavelength_err = wv_err_dict[color]
+        radius_err = diameter_err_dict[radius]
 
         try:
             # Read the CSV file
@@ -126,8 +140,10 @@ def extract_data_from_csv_files(folder_path):
             data_entry = {
                 'filename': filename,
                 'diameter': radius,
+                'diameter_error_um2': radius_err,
                 'color': color,
                 'wavelength': wavelength,
+                'wavelength_error_nm': wavelength_err,
                 'mean': mean_value,
                 'std_dev': std_dev
             }
@@ -154,7 +170,7 @@ def extract_data_from_csv_files(folder_path):
     result_df = pd.DataFrame(all_data)
 
     # Select and reorder columns we want for the output
-    columns = ['diameter', 'wavelength', 'mean', 'std_dev']
+    columns = ['diameter', 'diameter_error_um2', 'wavelength', 'wavelength_error_nm', 'mean', 'std_dev']
     if 'reference' in result_df.columns:
         columns.extend(['reference', 'normalized', 'std_dev_ref'])
 

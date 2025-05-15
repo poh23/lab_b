@@ -2,7 +2,7 @@ from pathlib import Path
 import pandas as pd
 
 # Define the file path using Path and raw string to avoid unicode errors
-file_path = Path(r"..\..\Harhava\data\Sodium_spectrum_2_reverse.txt")
+file_path = Path(r"..\..\Harhava\data\Mie\ref_red_precise.txt")
 
 # Read the file using whitespace as separator (new recommended method)
 df = pd.read_csv(file_path, sep=r'\s+')

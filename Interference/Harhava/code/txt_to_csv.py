@@ -57,5 +57,5 @@ def process_directory(directory_path):
 
 if __name__ == "__main__":
 
-    directory_path = r'..\data\Mie'
+    directory_path = r'..\data\Mie_angles'
     process_directory(directory_path)
