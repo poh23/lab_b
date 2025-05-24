@@ -1,6 +1,43 @@
 import pandas as pd
 import numpy as np
 import PyMieScatt as PMS
+import scipy.stats as stats
+
+# === 2. Constants ===
+n_sphere = 1.59
+n_medium = 1.33
+m_rel = n_sphere / n_medium
+L = 0.8  # cm path length
+
+def compute_Q_theory_pdf(diameter,diameter_error_um2, wl, n_bins=50):
+    """
+    Computes Q_sca averaged over a normal PDF of diameters.
+    - mean diameter = row['diameter'] (μm)
+    - std dev       = row['diameter_error_um2'] (μm)
+    Returns the PDF-weighted average Q_sca.
+    """
+    # build an array of diameters in nm
+    d_mean = diameter * 1e3             # μm → nm
+    d_sigma = diameter_error_um2 * 2 * 1e3  # μm → nm
+    # if sigma is zero, fall back to single value
+    if d_sigma == 0:
+        return PMS.MieQ(m=m_rel, wavelength=wl, diameter=d_mean)[1]
+    # sample diameters ±3σ
+    diameters = np.linspace(d_mean - 3*d_sigma,
+                            d_mean + 3*d_sigma,
+                            n_bins)
+
+    pdf = stats.norm.pdf(diameters, loc=d_mean, scale=d_sigma)
+    pdf /= np.trapz(pdf, diameters)  # normalize area = 1
+    # compute Qsca for each diameter
+    Qsca_vals = np.array([
+        PMS.MieQ(m=m_rel,
+                 wavelength=wl,
+                 diameter=d)[1]
+        for d in diameters
+    ])
+    # return weighted average
+    return np.trapz(Qsca_vals * pdf, diameters)
 
 def compute_cross_section(
     ref_file, meas_file,
@@ -63,23 +100,16 @@ def compute_cross_section(
     # Theoretical Q using PyMieScatt
     m = particle_index / medium_index
     radius_um = diameter_um / 2
-    Qsca = PMS.MieQ(m, wavelength=wavelength_nm, diameter=diameter_um * 1e3)[1]
+    Qsca = compute_Q_theory_pdf(diameter_um, radius_error_um*2, wavelength_nm)
 
     # Estimate theoretical error using finite differences
 
     # Error due to wavelength
-    Q_up = PMS.MieQ(m, wavelength=wavelength_nm + wavelength_error_nm, diameter=diameter_um * 1e3)[1]
-    Q_down = PMS.MieQ(m, wavelength=wavelength_nm - wavelength_error_nm, diameter=diameter_um * 1e3)[1]
+    Q_up = compute_Q_theory_pdf(diameter_um, radius_error_um*2, wavelength_nm + wavelength_error_nm)
+    Q_down = compute_Q_theory_pdf(diameter_um, radius_error_um*2, wavelength_nm - wavelength_error_nm)
     dQ_dlambda = (Q_up - Q_down) / (2 * wavelength_error_nm)
 
-    # Error due to radius
-    r_up = radius_um + radius_error_um
-    r_down = radius_um - radius_error_um
-    Q_r_up = PMS.MieQ(m, wavelength=wavelength_nm, diameter=2 * r_up * 1e3)[1]
-    Q_r_down = PMS.MieQ(m, wavelength=wavelength_nm, diameter=2 * r_down * 1e3)[1]
-    dQ_dr = (Q_r_up - Q_r_down) / (2 * radius_error_um)
-
-    Q_err = np.sqrt((dQ_dr * radius_error_um) ** 2 + (dQ_dlambda * wavelength_error_nm) ** 2)
+    Q_err = np.abs(dQ_dlambda * wavelength_error_nm)
 
     # Print results
     print(f"I0 = {I0:.4f} ± {I0_std:.4f}")

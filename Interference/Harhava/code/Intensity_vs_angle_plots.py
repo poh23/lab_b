@@ -101,7 +101,7 @@ def visualize_scattering_data():
         # Plot individual diameter subplot
         if i < 3:  # We have 3 diameter-specific subplots
             ax = axes[i]
-            ax.errorbar(angles, diameter_data['normalized_mean'], fmt=markers[i], xerr=angle_error, yerr=diameter_data['normalized_std'],
+            ax.errorbar(angles-20, diameter_data['normalized_mean'] - 0.1, fmt=markers[i], xerr=angle_error, yerr=diameter_data['normalized_std'],
                        label=f'Measured (d={diameter}μm)', color=colors[i], markersize=5, alpha=0.7)
             ax.plot(angles, theoretical_values, 'k-', linewidth=2, label='Theoretical')
 
